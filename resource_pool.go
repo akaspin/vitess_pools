@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"io"
 )
 
 var (
@@ -29,7 +30,8 @@ type Factory func() (Resource, error)
 // Thread synchronization between Close() and IsClosed()
 // is the responsibility of the caller.
 type Resource interface {
-	Close()
+	io.Closer
+	IsClosed() bool
 }
 
 // ResourcePool allows you to use a pool of resources.
@@ -77,8 +79,8 @@ func NewResourcePool(factory Factory, capacity, maxCap int, idleTimeout time.Dur
 // You can call Close while there are outstanding resources.
 // It waits for all resources to be returned (Put).
 // After a Close, Get is not allowed.
-func (rp *ResourcePool) Close() {
-	_ = rp.SetCapacity(0)
+func (rp *ResourcePool) Close() error {
+	return rp.SetCapacity(0)
 }
 
 // IsClosed returns true if the resource pool is closed.
