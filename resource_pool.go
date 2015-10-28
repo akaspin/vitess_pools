@@ -31,7 +31,6 @@ type Factory func() (Resource, error)
 // is the responsibility of the caller.
 type Resource interface {
 	io.Closer
-	IsClosed() bool
 }
 
 // ResourcePool allows you to use a pool of resources.
